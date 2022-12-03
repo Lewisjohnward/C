@@ -10,9 +10,7 @@
  */
 
 /*
- *
  * WORK IN PROGRESS: WILL NOT WORK
- *
  */
 
 char myprog[] = 
@@ -84,11 +82,11 @@ void parselines(char *prog, char *line[], int *ins){
     //    puts(line[j]);
 }
 
-void replacewithjmp(char *line, const int pos)
+void replacewithjmp(char *jmp, char *line, const int pos)
 {
     /* replaces given line with jmp instructions */
     char fmtstr[50];
-    sprintf(fmtstr, "jmp %d", pos+1);
+    sprintf(fmtstr, "%s %d", jmp, pos+1);
     strcpy(line, fmtstr);
 }
 
@@ -112,23 +110,28 @@ void replacefunctioncalls(char *line[], const int ins){
             /* copy function name senz white space (serves no purpose) */
             strcpy(line[i], tk);
             /* loop to find the function definition */
-            for(int j = i; j < ins; j++)
+            for(int j = i; j < ins; j++){
                 /* iterate to find function definition ':' = 58*/
                 if(strcmp(line[i], line[j]) == -58){
                     //strcpy(line[j], "FUN");
-                    replacewithjmp(line[i], j);
+                    replacewithjmp("jmp", line[i], j);
                     /* iterate to find function return */
-                    for(int k = j; j < ins; k++)
+                    for(int k = j; k < ins; k++)
                         if(!strcmp(line[k], "ret")){
-                            replacewithjmp(line[k], i);
+                            replacewithjmp("jmp", line[k], i);
                             break;
                         }
-
-                    /* NEEDS TO HANDLE CONDITIONAL JUMPS HERE */
-                    /* FUNCTIONS CAN JUMP TO OTHER FUNCTIONS */
-
-                    break;
+                    /* CONDITIONAL JUMP HANDLING HERE */
+                    for(int k = j; k < ins; k++)
+                        if(*line[k] ==  'j' && *(line[k] + 1) != 'm' && *line[k] != 'J'){
+                            strcpy(tmp, line[k]);
+                            tk = strtok(tmp, delim);
+                            strtok(NULL, "");
+                            tk[0] = 'J';
+                            replacewithjmp(tk, line[k], j);
+                        }
                 }
+            }
         }
     }
 }
