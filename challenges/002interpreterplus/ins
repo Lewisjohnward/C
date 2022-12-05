@@ -1,0 +1,15 @@
+00: mov a, 5
+01: mov b, a
+02: mov c, a
+03: jmp 7
+04: jmp 13
+05: end
+06: proc_fact:
+07: dec b
+08: mul c, b
+09: cmp b, 1
+10: jne 7
+11: jmp 4
+12: print:
+13: msg a, '! = ', c 
+14: jmp 5

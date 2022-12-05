@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "parser.h"
+
 /*
  * Codewars: Assembler interpreter (part 2)
  * https://www.codewars.com/kata/58e61f3d8ff24f774400002c
@@ -54,85 +53,91 @@ char myprog1[] =
 #define MAXREG 26
 
 
-void parselines(char *prog, char *line[], int *ins){
-    char ndelim[] = "\n";
-    char *temp;
 
-    temp = strtok(prog, ndelim);
-    do{
-        /* remove line comments & empty lines */
-        if(temp[0] != ';' && temp[0] != '\n' && temp[0] != ' ')
-            strcpy(line[(*ins)++], temp);
-        /* increment temp to trim whitespace */
-        else if(temp[0] == ' '){
-            while(*temp == ' ')
-            {*temp++;}
-            strcpy(line[(*ins)++], temp);
-        }
-    }while(temp = strtok(NULL, ndelim));
-
-    /* remove inline comments */
-    for(int j = 0; j < *ins; j++){
-        char cdelim[] = ";";
-        temp = strtok(line[j], cdelim);
-        strcpy(line[j], temp);
-    }
-
-    //for(int j = 0; j < *ins; j++)
-    //    puts(line[j]);
-}
-
-void replacewithjmp(char *jmp, char *line, const int pos)
-{
-    /* replaces given line with jmp instructions */
-    char fmtstr[50];
-    sprintf(fmtstr, "%s %d", jmp, pos+1);
-    strcpy(line, fmtstr);
-}
-
-void replacefunctioncalls(char *line[], const int ins){
-    char tmp[100];
+void executeinstructions(char *line[], int ins){
+    char registers[26] = { 0 };
+    int zf = 0;
+    int gf = 0;
     char delim[] = " ";
-    char *tk;
-    int jmpto = 0;
 
-    for(int i = 0; i < ins; i++){
-        /* if line starts will 'c'all & c'a'll to destinguish from cmp*/
-        if(*line[i] == 'c' && *(line[i]+1) == 'a'){
-            /*copy line to temp*/
-            strcpy(tmp, line[i]);
+    char opcode[4];
+    char dest;
+    char source;
 
-            strtok(tmp, delim);
-            /* tk contains function name e.g: call XX*/
-            tk = strtok(NULL, "");
-            /* while loop trims whitespace if present */
-            while(*tk == ' '){*tk++;}
-            /* copy function name senz white space (serves no purpose) */
-            strcpy(line[i], tk);
-            /* loop to find the function definition */
-            for(int j = i; j < ins; j++){
-                /* iterate to find function definition ':' = 58*/
-                if(strcmp(line[i], line[j]) == -58){
-                    //strcpy(line[j], "FUN");
-                    replacewithjmp("jmp", line[i], j);
-                    /* iterate to find function return */
-                    for(int k = j; k < ins; k++)
-                        if(!strcmp(line[k], "ret")){
-                            replacewithjmp("jmp", line[k], i);
-                            break;
-                        }
-                    /* CONDITIONAL JUMP HANDLING HERE */
-                    for(int k = j; k < ins; k++)
-                        if(*line[k] ==  'j' && *(line[k] + 1) != 'm' && *line[k] != 'J'){
-                            strcpy(tmp, line[k]);
-                            tk = strtok(tmp, delim);
-                            strtok(NULL, "");
-                            tk[0] = 'J';
-                            replacewithjmp(tk, line[k], j);
-                        }
-                }
+
+    int count = 0;
+    /* Iterate over *program[] */
+    for(int i = 0; ; count++, i++) {
+        printf("%d:%s\n", i, line[i]);
+
+        /* splits the instruction up
+         * ins[0] op
+         * ins[1] dest
+         * ins[2] source
+         */
+        if(count == 25) break;
+
+        sscanf(line[i], "%s %c, %c", opcode, &dest, &source);
+        printf("%s %c %c\n", opcode, dest, source);
+
+        /* conditional statement that
+         * register[**(ins+1)] is the value in dest
+         * register[**(ins+2)] is the value in source
+         *
+         * The Codewars challenge indexes the array using
+         * a-z but this implementation transforms a->0 
+         * z-> 26 hence the -97
+         */
+
+        if(!strcmp(opcode, "mov")) {
+            if(source - 97 < 0)
+                registers[dest - 97] = source - 48;
+            else
+                registers[dest - 97] = registers[source - 97];
+        } else if(!strcmp(opcode, "inc")) {
+            registers[dest - 97]++;
+        } else if(!strcmp(opcode, "dec")) {
+            registers[dest - 97]--;
+        } else if(!strcmp(opcode, "jmp")){
+            i = dest - 48 - 1;
+        } else if(!strcmp(opcode, "mul")){
+            registers[dest - 97] = registers[source - 97] * registers[dest - 97];
+        } else if(!strcmp(opcode, "cmp")){
+            if(source - 97 < 0){
+                if(registers[dest - 97] - (source - 48) > 0){
+                    gf = 1;
+                }else
+                    gf = 0;
+                if(registers[dest - 97] - (source - 48) == 0){
+                    zf = 1;
+                }else
+                    zf = 0;
             }
+            else{
+                if(registers[dest - 97] - registers[source - 97] > 0){
+                    gf = 1;
+                }else
+                    gf = 0;
+                if(registers[dest - 97] - registers[source - 97] == 0)
+                    zf = 1;
+                else
+                    zf = 0;
+            }
+        } else if(!strcmp(opcode, "jne")){
+            if(!zf)
+                i = dest - 48 - 1;
         }
+
+
+        printf("gf: %d zf: %d\n", gf, zf);
+
+        /* prints out registers & their values */
+        for(int j = 0; j < 26; j++)
+            printf("%c ", 97 + j);
+        puts("");
+        for(int j = 0; j < 26; j++)
+            printf("%d ", registers[j]);
+        puts("\n");
     }
 }
 
@@ -141,11 +146,15 @@ int main (void){
     char buf[20];
     int ins = 0;
 
+    /* allocate space for instructions arr */
     for(int i = 0; i < 100; i++) 
         line[i] = malloc(100 * sizeof(char));
 
-    parselines(myprog1, line, &ins);
-    replacefunctioncalls(line, ins);
+    /* parse string program and place instructions in line[] */
+    parseinstructions(myprog1, line, &ins);
+
+    executeinstructions(line, ins);
+
 
     for(int j = 0; j < ins; j++)
     {
