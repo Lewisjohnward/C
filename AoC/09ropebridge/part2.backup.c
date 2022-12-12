@@ -29,7 +29,6 @@ int main (void){
     /* initialise head & tail to middle of board */
     coords knot[NUMKNOTS];
     coords temp;
-    coords temp1;
 
     /* visited is an array of coords that tail has visited */
     coords visited[100000];
@@ -87,8 +86,6 @@ int main (void){
             printf("0: %d %d\n", knot[0].x, knot[0].y);
 
             for(int i = 1; i < NUMKNOTS; i++){
-                temp1.x = knot[i].x;
-                temp1.y = knot[i].y;
 
                 /* move each knot along the array */
                 /* if tail is not adjacent to head */
@@ -98,8 +95,24 @@ int main (void){
                                 knot[i - 1].y -1 != knot[i].y &&
                                 knot[i - 1].y != knot[i].y &&
                                 knot[i - 1].y + 1 != knot[i].y)){
-                    knot[i].x = temp.x;
-                    knot[i].y = temp.y;
+                    switch(knot[i - 1].dir){
+                        case 'L':
+                            knot[i].x = knot[i - 1].x + 1;
+                            knot[i].y = knot[i - 1].y;
+                            break;
+                        case 'R':
+                            knot[i].x = knot[i - 1].x - 1;
+                            knot[i].y = knot[i - 1].y;
+                            break;
+                        case 'U':
+                            knot[i].x = knot[i - 1].x;
+                            knot[i].y = knot[i - 1].y - 1;
+                            break;
+                        case 'D':
+                            knot[i].x = knot[i - 1].x;
+                            knot[i].y = knot[i - 1].y + 1;
+                            break;
+                    }
                 }
                 printf("%d: %d %d\n", i, knot[i].x, knot[i].y);
 
