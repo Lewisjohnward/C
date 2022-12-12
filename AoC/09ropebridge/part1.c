@@ -1,7 +1,7 @@
 /*
  * Advent of Code 2022 day 9: Rope bridge
  * Part 1
- * time taken: WIP
+ * time taken: 3.5 hours
  */
 
 #include <stdio.h>
@@ -15,8 +15,6 @@ typedef struct coords{
     unsigned int x;
     unsigned int y;
 }coords;
-
-
 
 int main (void){
     /* declare file pointer */
@@ -46,16 +44,10 @@ int main (void){
         exit(-1);
     }
 
-    /* H can cover T */
-    /* COUNT ALL POSITIONS TAIL VISITED AT LEAST ONCE */
-    /* Tail is always adjacent to head */
-
-    int count = 0;
+    /* direction holds char direction i.e. 'L' */
     char direction;
+    /* spaces holds number of times to move direction */
     int spaces = 0;
-    int prevvert = 0;
-    int prevhoriz = 0;
-    char prevdir;
     /* read line of instruction */
     while(fgets(instruction, 100, fp)){
         /* remove newline */
@@ -65,120 +57,72 @@ int main (void){
         strtok(instruction, " ");
         spaces = atoi(strtok(NULL, ""));
 
-        //puts(instruction);
-        printf("%c %d\n", instruction[0], spaces);
-
         for(int i = 0; i < spaces; i++){
             /* move head first */
             switch(direction){
                 case 'L':
                     head.x -= 1;
-                    /* if tail not adjacent move tail */
-                    if(prevvert == 0 && prevdir != 'R'){
-                        if(head.x + 1 != tail.x){
-                            tail.x -= 1;
-                        }
-                    }else if (prevvert == 2){
-                        tail.x = head.x + 1;
-                        tail.y = head.y;
-                        prevvert = 0;
-                    }
-                    if(prevvert != 0){
-                        prevvert++;
-                    }
-                    prevdir = 'L';
-
-                    prevhoriz = 1;
                     break;
-
-                case 'D':
-                    head.y -= 1;
-                    if(prevhoriz == 0 && prevdir != 'U'){
-                        if(head.y + 1 != tail.y){
-                            tail.y -= 1;
-                        }
-                    }else if (prevhoriz == 2){
-                        tail.y = head.y + 1;
-                        tail.x = head.x;
-                        prevhoriz = 0;
-                    }
-                    if(prevhoriz != 0){
-                        prevhoriz++;
-                    }
-                    prevvert = 1;
-                    prevdir = 'D';
-                    break;
-
                 case 'R':
                     head.x += 1;
-                    if(prevvert == 0 && prevdir != 'L'){
-                        if(head.x - 1 != tail.x){
-                            tail.x += 1;
-                        }
-                    }else if (prevvert == 2){
-                        tail.x = head.x - 1;
-                        tail.y = head.y;
-                        prevvert = 0;
-                    }
-                    if(prevvert != 0){
-                        prevvert++;
-                    }
-
-                    prevhoriz = 1;
-                    prevdir = 'R';
                     break;
-
                 case 'U':
                     head.y += 1;
-                    if(prevhoriz == 0 && prevdir != 'D'){
-                        if(head.y - 1 != tail.y){
-                            tail.y += 1;
-                        }
-                    }else if (prevhoriz == 2){
-                        tail.y = head.y - 1;
-                        tail.x = head.x;
-                        prevhoriz = 0;
-                    }
-                    if(prevhoriz != 0){
-                        prevhoriz++;
-                    }
-                    prevvert = 1;
-                    prevdir = 'U';
+                    break;
+                case 'D':
+                    head.y -= 1;
                     break;
             }
 
+            /* move tail */
+            /* if tail is not adjacent to head */
+            if((head.x -1 != tail.x &&
+                    head.x != tail.x &&
+                    head.x + 1 != tail.x) || (
+                    head.y -1 != tail.y &&
+                    head.y != tail.y &&
+                    head.y + 1 != tail.y)){
+                switch(direction){
+                    case 'L':
+                        tail.x = head.x + 1;
+                        tail.y = head.y;
+                        break;
+                    case 'R':
+                        tail.x = head.x - 1;
+                        tail.y = head.y;
+                        break;
+                    case 'U':
+                        tail.x = head.x;
+                        tail.y = head.y - 1;
+                        break;
+                    case 'D':
+                        tail.x = head.x;
+                        tail.y = head.y + 1;
+                        break;
+                }
+            }
+
+            /* update visited array */
             visited[positions].x = tail.x;
             visited[positions++].y = tail.y;
         }
-        //count++;
-        //if(count == 10) break;
-    }
-    puts("Finishing position");
-    printf("head: %d %d\n", head.x, head.y);
-    printf("tail: %d %d\n", tail.x, tail.y);
-
-    puts("Positions visited");
-    for(int i = 0; i < positions; i++){
-        printf("%i %d %d\n", i, visited[i].x, visited[i].y);
     }
 
+    /* initialise unique count */
     int unique = 0;
 
-    for(int i = 0; i < positions; i++){
-        for(int j = i + 1; j < positions; j++){
+    /* find unique positions - set duplicate positions to zero */
+    for(int i = 0; i < positions; i++)
+        for(int j = i + 1; j < positions; j++)
             if(visited[i].x == visited[j].x && visited[i].y == visited[j].y)
-            {
-                visited[j].x = 0;
-                visited[j].y = 0;
-            }
-        }
-    }
+            { visited[j].x = 0; visited[j].y = 0; }
 
-    for(int i = 0; i < positions; i++){
-        if(visited[i].x != 0)
-            unique++;
-    }
-    printf("unique: %d\n", unique);
+    /* count the non zero coords */
+    for(int i = 0; i < positions; i++)
+        if(visited[i].x != 0) unique++;
+    
+    /* print unique positions */
+    printf("Unique: %d\n", unique);
 
     /* free memory previously allocated */
     for(int i = 0; i < CELLS; i++){
