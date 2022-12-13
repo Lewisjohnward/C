@@ -13,7 +13,10 @@ noecho()
 keypad()
 halfdelay()
 
+COLS contains # of columns
+LINES contains # of lines
 
+move(y, x) - Move cursor to (x, y)
 mvprintw(y, x, string) - Move to (y, x) then print string.
 wprintw(window, "string") - Print on window window at present cursor position in the window.
 mvwprintw(win, y, x, string) - Move to y, x relative to window coords & print.
@@ -22,6 +25,10 @@ wrefresh(win)
 addch()
 printw()
 addstr()
+
+box(local_win, 0, 0)
+wborder(local_win, '-', '-', '-','-','-','-','-','-');
+curs_set(0: invis, 1: normal, 2: v vis)
 
 attron()
 attroff()
