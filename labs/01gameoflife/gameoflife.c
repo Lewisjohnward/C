@@ -85,6 +85,7 @@ int main (int argc, char *argv[]){
     struct timeval start_time, end_time;
 
 
+    /* init modifications */
     modifications modifications;
     modifications.count = 0;
     /* allocate memory for X rows */
