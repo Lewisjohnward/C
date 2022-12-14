@@ -59,8 +59,9 @@ typedef struct world {
 }world;
 
 void printworld(world *world);
+void printlivecells(int livecells);
 void printmodifications(modifications *modifications);
-void findlivecell(world *world, modifications *modifications);
+void findlivecell(world *world, modifications *modifications, int *livecells);
 int iscelllonely(world *world, int x, int y);
 int iscellloverpopulated(world *world, int x, int y);
 void finddeadcell(world *world, modifications *modifications);
@@ -78,6 +79,8 @@ int main (int argc, char *argv[]){
     world world;
     /* if there are 2 command line args then atoi argv[2] otherwise use 30 */
     world.rows = world.cols = argc == 2 ? atoi(argv[1]) : 30;
+
+    int livecells = 0;
 
     unsigned int iterations = 10000;
     init init;
@@ -111,10 +114,12 @@ int main (int argc, char *argv[]){
     puts("Start");
     printworld(&world);
     for(int i = 0; i < iterations; i++){
-        printworld(&world);
         /* for each live cell are there 0 or 1 neighbours ?*/
-        findlivecell(&world, &modifications);
+        findlivecell(&world, &modifications, &livecells);
         finddeadcell(&world, &modifications);
+        printworld(&world);
+        printlivecells(livecells);
+        livecells = 0;
 
         //finddeadwithneighbours
 
@@ -203,11 +208,13 @@ void addmodification(modifications *modifications, int life, int y, int x){
     modifications->count++;
 }
 
-void findlivecell(world *world, modifications *modifications){
+void findlivecell(world *world, modifications *modifications, int *livecells){
     /* iterate over world to find live cells */
     for(int j = 0; j < world->cols; j++)
         for(int k = 0; k < world->rows; k++){
             if(world->grid[j][k] == 1){
+                /* add to livecell count */
+                (*livecells)++; 
                 /* are there 0 or 1 neighbours ? */
                 if (iscelllonely(world, j, k)){
                     /* update modification array */
@@ -288,4 +295,8 @@ void printworld(world *world){
             printf("%c ", world->grid[i][j] ? '@' : '.');
         puts("");
     }
+}
+
+void printlivecells(int livecells){
+    printf("Live cells: %d\n", livecells);
 }
