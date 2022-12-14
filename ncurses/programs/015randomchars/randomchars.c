@@ -33,9 +33,13 @@ int main (void){
         randx = rand() % ((COLS - 1) + 1);
         /* generate random y coord between 0 and LINES*/
         randy = rand() % ((LINES - 1) + 1);
+        /* move cursor to new position */
         move(randy, randx);
+        /* print char */
         printw("%c", alphabet[randint]);
+        /* refresh display */
         refresh();
+        /* sleep 1000 microseconds */
         usleep(1000);
     }
 

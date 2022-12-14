@@ -14,11 +14,12 @@ int main(int argc, char *argv[])
 					 * everty thing to me 		*/
 	keypad(stdscr, TRUE);		/* I need that nifty F1 	*/
 
-	height = 3;
-	width = 10;
+	height = 10;
+	width = 50;
 	starty = (LINES - height) / 2;	/* Calculating for a center placement */
 	startx = (COLS - width) / 2;	/* of the window		*/
 	printw("Press q to exit");
+    printw("startx: %d, starty: %d", startx, starty);
 	refresh();
 	my_win = create_newwin(height, width, starty, startx);
 

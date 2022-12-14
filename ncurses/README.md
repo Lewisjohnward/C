@@ -38,7 +38,9 @@ addch(ch)
 
 mvaddch(row, col, ch)
 
-newwin() - Creates a new window. returns a pointer to structure WINDOW
+newwin( height, width, starty, startx) - Creates a new window. returns a pointer to structure WINDOW
+box(window, 0, 0);
+wrefresh(window);
 
 
 
