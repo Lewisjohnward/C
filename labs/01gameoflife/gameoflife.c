@@ -32,7 +32,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <ctype.h>
 
 /* contains initial live cell */
 typedef struct init{
@@ -58,6 +58,7 @@ typedef struct world {
     int **grid;
 }world;
 
+void rungol();
 void printworld(world *world);
 void printlivecells(int livecells);
 void printmodifications(modifications *modifications);
@@ -73,12 +74,22 @@ void updateworld(world *world, modifications *modifications);
 
 
 int main (int argc, char *argv[]){
+
+    rungol();
+
+    return 0;
+}
+
+
+void rungol(void){
     //void srand(SEED);
     //int rand();
+
     unsigned int rows, cols;
     world world;
     /* if there are 2 command line args then atoi argv[2] otherwise use 30 */
-    world.rows = world.cols = argc == 2 ? atoi(argv[1]) : 30;
+    world.rows = world.cols = 30;
+    //world.rows = world.cols = argc == 2 ? atoi(argv[1]) : 30;
 
     int livecells = 0;
 
@@ -151,7 +162,6 @@ int main (int argc, char *argv[]){
 
     /* calculate difference in time */
     printf("Time taken: %lu,  %d iterations\n", end_time.tv_usec - start_time.tv_usec, iterations);
-    return 0;
 }
 
 int iscelllonely(world *world, int x, int y){
