@@ -37,6 +37,7 @@ typedef struct world {
 
 void rungol(void);
 void printworld(world *world);
+void printiterations(int iterations);
 void printlivecells(int livecells);
 void printmodifications(modifications *modifications);
 void findlivecell(world *world, modifications *modifications, int *livecells);

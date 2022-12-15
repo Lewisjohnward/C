@@ -48,6 +48,7 @@ void rungol(void){
         findlivecell(&world, &modifications, &livecells);
         finddeadcell(&world, &modifications);
         printworld(&world);
+        printiterations(i);
         printlivecells(livecells);
         livecells = 0;
 
@@ -61,7 +62,7 @@ void rungol(void){
         updateworld(&world, &modifications);
 
         //printworld(&world);
-        //usleep(100000);  // sleep for 100,000 micro seconds (0.1 seconds)
+        usleep(100000);  // sleep for 100,000 micro seconds (0.1 seconds)
         //sleep(1);
     }
 
@@ -224,6 +225,9 @@ void printworld(world *world){
             printf("%c ", world->grid[i][j] ? '@' : '.');
         puts("");
     }
+}
+void printiterations(int iterations){
+    printf("Iteration: %d\n", iterations);
 }
 
 void printlivecells(int livecells){
