@@ -16,7 +16,6 @@
  * aflag = 0, bflag = 0, cvalue = foo
  */
 
-
 int main (int argc, char *argv[]){
 
     int aflag = 0;
