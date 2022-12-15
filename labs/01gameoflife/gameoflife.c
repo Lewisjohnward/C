@@ -59,12 +59,6 @@ int main (int argc, char *argv[]){
      * mode 1 gol with ascii animations
      */
 
-
-
-
-
-
-
     rungol();
 
     return 0;
