@@ -52,11 +52,12 @@ char myprog1[] =
 #define MAXLINE 200
 #define MAXREG 26
 
-
-
 void executeinstructions(char *line[], int ins){
+    /* array of registers to hold register values */
     char registers[26] = { 0 };
+    /* zero flag */
     int zf = 0;
+    /* greater than flag */
     int gf = 0;
     char delim[] = " ";
 
@@ -64,20 +65,25 @@ void executeinstructions(char *line[], int ins){
     char dest;
     char source;
 
-
     int count = 0;
-    /* Iterate over *program[] */
-    for(int i = 0; ; count++, i++) {
-        printf("%d:%s\n", i, line[i]);
+    int instruction = 0;
+    /* while instruction is not "end" execute */
+    while(strcmp(line[instruction], "end")){
+        /* print line for debugging */
+        printf("%d:%s\n", instruction, line[instruction]);
 
         /* splits the instruction up
          * ins[0] op
          * ins[1] dest
          * ins[2] source
          */
-        if(count == 25) break;
 
-        sscanf(line[i], "%s %c, %c", opcode, &dest, &source);
+        /* for debugging */
+        if(count == 12) break;
+
+        /* sscanf parses line and places in respective variables */
+        sscanf(line[instruction], "%s %c, %c", opcode, &dest, &source);
+        /* print variables for debugging */
         printf("%s %c %c\n", opcode, dest, source);
 
         /* conditional statement that
@@ -99,7 +105,7 @@ void executeinstructions(char *line[], int ins){
         } else if(!strcmp(opcode, "dec")) {
             registers[dest - 97]--;
         } else if(!strcmp(opcode, "jmp")){
-            i = dest - 48 - 1;
+            instruction = dest - 48 - 1;
         } else if(!strcmp(opcode, "mul")){
             registers[dest - 97] = registers[source - 97] * registers[dest - 97];
         } else if(!strcmp(opcode, "cmp")){
@@ -125,7 +131,7 @@ void executeinstructions(char *line[], int ins){
             }
         } else if(!strcmp(opcode, "jne")){
             if(!zf)
-                i = dest - 48 - 1;
+                instruction = dest - 48 - 1;
         }
 
 
@@ -138,6 +144,9 @@ void executeinstructions(char *line[], int ins){
         for(int j = 0; j < 26; j++)
             printf("%d ", registers[j]);
         puts("\n");
+
+        count++;
+        instruction++;
     }
 }
 
@@ -153,6 +162,7 @@ int main (void){
     /* parse string program and place instructions in line[] */
     parseinstructions(myprog1, line, &ins);
 
+    /* execute instructions a line at a time */
     executeinstructions(line, ins);
 
 
