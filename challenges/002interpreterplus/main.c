@@ -45,12 +45,26 @@ char myprog1[] =
 
 
 
+
 #include <string.h>
 #include <stdlib.h>
 
 #define MAXBUF 1024
 #define MAXLINE 200
 #define MAXREG 26
+
+void printregisters(char *registers, int zf, int gf){
+    printf("gf: %d zf: %d\n", gf, zf);
+    /* prints out registers & their values */
+    for(int j = 0; j < 26; j++)
+        printf("%c ", 97 + j);
+    puts("");
+    for(int j = 0; j < 26; j++)
+        printf("%d ", registers[j]);
+    puts("\n");
+}
+
+
 
 void executeinstructions(char *line[], int ins){
     /* array of registers to hold register values */
@@ -65,8 +79,12 @@ void executeinstructions(char *line[], int ins){
     char dest;
     char source;
 
+    int jmpdest = 0;
+
     int count = 0;
     int instruction = 0;
+
+    char msgbuffer[100];
     /* while instruction is not "end" execute */
     while(strcmp(line[instruction], "end")){
         /* print line for debugging */
@@ -79,7 +97,7 @@ void executeinstructions(char *line[], int ins){
          */
 
         /* for debugging */
-        if(count == 12) break;
+        //if(count == 52) break;
 
         /* sscanf parses line and places in respective variables */
         sscanf(line[instruction], "%s %c, %c", opcode, &dest, &source);
@@ -95,6 +113,14 @@ void executeinstructions(char *line[], int ins){
          * z-> 26 hence the -97
          */
 
+        if(!strcmp(opcode, "jmp")){
+            char *ptr = line[instruction];
+            ptr += strlen("jmp") + 1;
+            jmpdest = atoi(ptr);
+        }
+
+
+
         if(!strcmp(opcode, "mov")) {
             if(source - 97 < 0)
                 registers[dest - 97] = source - 48;
@@ -105,7 +131,7 @@ void executeinstructions(char *line[], int ins){
         } else if(!strcmp(opcode, "dec")) {
             registers[dest - 97]--;
         } else if(!strcmp(opcode, "jmp")){
-            instruction = dest - 48 - 1;
+            instruction = jmpdest - 1;
         } else if(!strcmp(opcode, "mul")){
             registers[dest - 97] = registers[source - 97] * registers[dest - 97];
         } else if(!strcmp(opcode, "cmp")){
@@ -132,22 +158,57 @@ void executeinstructions(char *line[], int ins){
         } else if(!strcmp(opcode, "jne")){
             if(!zf)
                 instruction = dest - 48 - 1;
+        } else if(!strcmp(opcode, "msg")){
+            char msg[50];
+            char *msgptr = msg;
+            /* pointer to instruction */
+            char *ptr = line[instruction];
+            /* increment pointer to remove msg*/
+            while(*ptr++ != ' ');
+
+            while(*ptr != '\0'){
+                if(*ptr > 96 && *ptr < 123){
+                    printf("%c\n", registers[*ptr - 97] + '0');
+                    *msgptr++ = registers[*ptr - 97] + '0';
+                    *msgptr = '\0';
+                    puts(msg);
+                }
+                /* start of string */
+                if(*ptr == '\''){
+                    /* first char of string */
+                    *ptr++;
+                    /* while not pointing to end of string */
+                    while(*ptr != '\''){
+                        *msgptr++ = *ptr;
+                        *msgptr = '\0';
+                        *ptr++;
+                    }
+                }
+                *ptr++;
+            }
+            puts(msg);
+            strcpy(msgbuffer, msg);
+            /*
+             *   print:\n\
+             *    msg   a, '! = ', c ; output text\n\
+             *    ret\n\
+             *  ", "5! = 120");
+             */
+
+        } else{
+            puts("INSTRUCTION NOT RECOGNISED!!\nending program");
+            break;
         }
+        printregisters(registers, zf, gf);
 
 
-        printf("gf: %d zf: %d\n", gf, zf);
-
-        /* prints out registers & their values */
-        for(int j = 0; j < 26; j++)
-            printf("%c ", 97 + j);
-        puts("");
-        for(int j = 0; j < 26; j++)
-            printf("%d ", registers[j]);
-        puts("\n");
 
         count++;
         instruction++;
     }
+    puts("end");
+    printregisters(registers, zf, gf);
+    printf("%s\n", msgbuffer);
 }
 
 int main (void){
