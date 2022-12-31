@@ -1,5 +1,3 @@
-
-
 /*
  * Codewars: Assembler interpreter (part 2)
  * https://www.codewars.com/kata/58e61f3d8ff24f774400002c
@@ -15,9 +13,6 @@
 #include "parser.h"
 #include "interpreter.h"
 #include "exampleprogs.h"
-
-
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -50,7 +45,7 @@ void executeinstructions(char *line[], int ins){
     /* current instruction */
     int instructionpointer = 0;
     /* msgbuffer contains print statements */
-    char msgbuffer[100];
+    char msgbuffer[100] = { 0 };
     /* while instruction is not "end" execute */
     while(strcmp(line[instructionpointer], "end")){
         /* print line for debugging */
@@ -91,17 +86,17 @@ int main (void){
     for(int i = 0; i < 100; i++) 
         line[i] = malloc(1000 * sizeof(char));
 
-
     /* parse string program and place instructions in line[] */
     parseinstructions(myprog4, line, &ins);
-
-    /* execute instructions a line at a time */
-    executeinstructions(line, ins);
-
 
     for(int j = 0; j < ins; j++)
     {
         printf("%02d: ", j);
         puts(line[j]);
     }
+
+    /* execute instructions a line at a time */
+    executeinstructions(line, ins);
+
+
 }

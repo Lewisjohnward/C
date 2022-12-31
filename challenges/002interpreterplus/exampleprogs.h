@@ -6,7 +6,7 @@
 #ifndef HEADER_EXAMPLEPROGS
 #define HEADER_EXAMPLEPROGS
 
-char myprog[] = 
+char myprog1[] = 
 "; My first program\n"
 "mov  a, 5\n"
 "inc  a\n"
@@ -18,7 +18,7 @@ char myprog[] =
 "    div  a, 2\n"
 "    ret\n";
 
-char myprog1[] = 
+char myprog2[] = 
 "mov   a, 5\n"
 "mov   b, a\n"
 "mov   c, a\n"

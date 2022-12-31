@@ -26,12 +26,21 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
             registers[dest - 97] = source - 48;
         else
             registers[dest - 97] = registers[source - 97];
+    } else if(!strcmp(opcode, "add")){
+        if(source - 97 < 0)
+            registers[dest - 97] = registers[dest - 97] + (source - 48);
+        else
+            registers[dest - 97] = registers[dest - 97] +registers[source - 97];
     } else if(!strcmp(opcode, "inc")) {
         registers[dest - 97]++;
     } else if(!strcmp(opcode, "dec")) {
         registers[dest - 97]--;
     } else if(!strcmp(opcode, "jmp")){
         *instructionpointer = jmpdest - 1;
+    }else if(!strcmp(opcode, "jl")){
+        if(*gf)
+            *instructionpointer = jmpdest - 1;
+            
     } else if(!strcmp(opcode, "mul")){
         registers[dest - 97] = registers[source - 97] * registers[dest - 97];
     } else if(!strcmp(opcode, "cmp")){
@@ -58,6 +67,8 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
     } else if(!strcmp(opcode, "jne")){
         if(!zf)
             *instructionpointer = dest - 48 - 1;
+    }else if(!strcmp(opcode, "jle")){
+        if (zf || *gf) *instructionpointer = dest - 48 - 1;
     } else if(!strcmp(opcode, "msg")){
         char msg[50];
         char buf[50];
@@ -78,11 +89,14 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
                 *ptr++;
                 /* while not pointing to end of string */
                 while(*ptr != '\''){
+                    printf("%c\n", *ptr);
                     *msgptr++ = *ptr;
                     *msgptr = '\0';
                     *ptr++;
                 }
+                printf("%s\n", msg);
                 strcat(msgbuffer, msg);
+                printf("%s\n", msgbuffer);
             }
             *ptr++;
         }
@@ -92,6 +106,8 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
             registers[dest - 97] = registers[dest - 97] / (source - 48);
         else
             registers[dest - 97] = registers[dest - 97] / registers[source - 97];
+    }else if(strchr(instruction, ':')){
+    
     }else{
         puts("INSTRUCTION NOT RECOGNISED!!\nending program");
         abort();
