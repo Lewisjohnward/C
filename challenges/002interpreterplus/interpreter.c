@@ -19,7 +19,7 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
     }
 
     /* print variables for debugging */
-    printf("%s %c %c\n", opcode, dest, source);
+    printf("op: %s dest: %c source: %c\n", opcode, dest, source);
 
     if(!strcmp(opcode, "mov")) {
         if(source - 97 < 0)
@@ -38,12 +38,13 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
     } else if(!strcmp(opcode, "jmp")){
         *instructionpointer = jmpdest - 1;
     }else if(!strcmp(opcode, "jl")){
-        if(*gf)
+        if(!*gf)
             *instructionpointer = jmpdest - 1;
             
     } else if(!strcmp(opcode, "mul")){
         registers[dest - 97] = registers[source - 97] * registers[dest - 97];
     } else if(!strcmp(opcode, "cmp")){
+        /* If source is less than 97 refers to constant */
         if(source - 97 < 0){
             if(registers[dest - 97] - (source - 48) > 0){
                 *gf = 1;
@@ -54,6 +55,7 @@ void interpretinstruction(int *instructionpointer, char *instruction, char *regi
             }else
                 *zf = 0;
         }
+        /* Source is a register */
         else{
             if(registers[dest - 97] - registers[source - 97] > 0){
                 *gf = 1;
