@@ -21,7 +21,8 @@
 #define MAXLINE 200
 #define MAXREG 26
 
-void printregisters(char *registers, int zf, int gf){
+void printregisters(char *registers, int zf, int gf, int count){
+    printf("count: %d\n", count);
     printf("gf: %d zf: %d\n", gf, zf);
     /* prints out registers & their values */
     for(int j = 0; j < 26; j++)
@@ -52,7 +53,7 @@ void executeinstructions(char *line[], int ins){
         printf("%d:%s\n", instructionpointer, line[instructionpointer]);
 
         /* for debugging */
-        if(count == 30) break;
+        if(count == 70) break;
 
         /* interpret instruction and update registers */
         interpretinstruction(&instructionpointer, line[instructionpointer], registers, &gf, &zf, msgbuffer);
@@ -67,13 +68,13 @@ void executeinstructions(char *line[], int ins){
          */
 
         /* print registers */
-        printregisters(registers, zf, gf);
+        printregisters(registers, zf, gf, count);
 
         count++;
         instructionpointer++;
     }
     //puts("end");
-    printregisters(registers, zf, gf);
+    printregisters(registers, zf, gf, count);
     printf("%s\n", msgbuffer);
 }
 
@@ -87,7 +88,7 @@ int main (void){
         line[i] = malloc(1000 * sizeof(char));
 
     /* parse string program and place instructions in line[] */
-    parseinstructions(myprog4, line, &ins);
+    parseinstructions(myprog2, line, &ins);
 
     for(int j = 0; j < ins; j++)
     {
@@ -96,7 +97,7 @@ int main (void){
     }
 
     /* execute instructions a line at a time */
-    executeinstructions(line, ins);
+    //executeinstructions(line, ins);
 
 
 }

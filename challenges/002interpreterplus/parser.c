@@ -60,7 +60,12 @@ void replacewithjmp(char *jmp, char *line, const int pos)
     strcpy(line, fmtstr);
 }
 
+
 void replacefunctioncalls(char *line[], const int ins){
+
+
+
+
     char tmp[100];
     char delim[] = " ";
     char *tk;
